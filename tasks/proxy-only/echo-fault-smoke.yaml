@@ -1,0 +1,39 @@
+# tasks/echo-fault-smoke.yaml
+#
+# Smoke task for testing fault injection via the Cline integration.
+# The grader is intentionally empty — this task exists only to
+# supply a `fault_injection` plan to `faultline proxy`.
+#
+# Expected behavior when Cline calls `echo`:
+#   - Call #1 → fault injected (timeout), server never reached
+#   - Call #2 (retry) → forwarded to real mock server, succeeds
+
+id: "echo-fault-smoke-001"
+name: "Echo tool fault smoke"
+description: "Exercise fault injection on the echo tool via the Cline proxy."
+goal: "Echo a message using the echo tool, surviving one injected timeout."
+
+allowed_tools:
+  - echo
+
+forbidden_actions: []
+
+invariants: []
+
+fault_injection:
+  - tool: echo
+    call_number: 1
+    fault: timeout
+    message: "injected timeout on echo (call #1)"
+
+recovery:
+  primary: echo
+  acceptable: []
+  max_attempts: 3
+  expected_outcome: recovered
+  allowed_strategies:
+    - retry
+
+grader:
+  state_assertions: []
+  policy_assertions: []

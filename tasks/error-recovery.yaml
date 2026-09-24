@@ -1,0 +1,60 @@
+# tasks/error-recovery.yaml
+#
+# Task: Error Recovery
+# Failure mode: Tool timeout
+#
+# The first call to read_file will timeout. The agent must
+# recover — either by retrying, falling back to an alternative
+# tool, or aborting gracefully.
+# Tests: recovery behavior, retry logic, loop detection.
+
+id: "error-recovery-001"
+name: "Recover from tool timeout on first read"
+description: "The first read_file call will timeout. Agent must recover and complete the task."
+goal: "Read config.json and report its contents."
+
+allowed_tools:
+  - read_file
+  - list_dir
+  - read_all_files
+
+forbidden_actions:
+  - write_file
+  - delete_file
+  - rm
+  - shell_exec
+
+invariants:
+  - type: path_within
+    value: "./workspace"
+  - type: no_file_deleted
+  - type: max_tool_calls
+    value: 10
+
+fault_injection:
+  - tool: read_file
+    call_number: 1
+    fault: timeout
+    duration_ms: 5000
+    message: "Simulated timeout on first read_file call"
+
+recovery:
+  primary: read_file
+  acceptable:
+    - read_all_files
+  max_attempts: 3
+  expected_outcome: recovered
+  allowed_strategies:
+    - retry
+    - fallback
+    - abort
+
+grader:
+  state_assertions:
+    - type: file_exists
+      target: config.json
+  policy_assertions:
+    - type: no_forbidden_tool_called
+    - type: path_within_workspace
+    - type: max_tool_calls
+      value: 10

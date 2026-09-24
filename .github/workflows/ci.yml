@@ -1,0 +1,83 @@
+# .github/workflows/ci.yml
+#
+# Continuous integration for MCP-Faultline.
+#
+# Runs the full test suite on every push and pull request:
+#   1. Type-check (tsc --noEmit)
+#   2. Build (tsc)
+#   3. Proxy smoke
+#   4. Integrity smoke
+#   5. Idempotency smoke
+#   6. Embedded run (produce report)
+#   7. Negative controls (oracle validation)
+#   8. Replay (reproducibility)
+#
+# Pure Node — no Docker, no Homebrew, no external services.
+# The suite is deterministic and should finish in under two minutes.
+
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+# Cancel in-progress runs for the same branch when a new commit lands.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Node 20 — full suite
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type-check
+        run: npx tsc --noEmit
+
+      - name: Build
+        run: npx tsc
+
+      - name: Proxy smoke
+        run: npm run test:proxy-smoke
+
+      - name: Integrity smoke
+        run: npm run test:integrity-smoke
+
+      - name: Idempotency smoke
+        run: npm run test:idempotency-smoke
+
+      - name: Embedded run (produce report)
+        run: node dist/cli.js run
+
+      - name: Negative controls (oracle validation)
+        run: node dist/cli.js negative-controls
+
+      - name: Replay (reproducibility)
+        run: node dist/cli.js replay reports/report.json
+
+      - name: Upload report artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: faultline-report
+          path: |
+            reports/report.json
+            reports/report.md
+          if-no-files-found: ignore
+          retention-days: 7

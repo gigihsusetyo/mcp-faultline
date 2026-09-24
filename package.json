@@ -1,0 +1,50 @@
+{
+  "name": "mcp-faultline",
+  "version": "0.1.0",
+  "description": "Failure-mode evaluation for MCP agents — inject faults, observe trajectory, grade resilience.",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "mcp-faultline": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js",
+    "test": "node --test dist-test/tests/",
+    "test:build": "tsc -p tsconfig.test.json",
+    "clean": "rm -rf dist dist-test",
+    "test:proxy-smoke": "node dist/testing/proxy-smoke.js",
+    "test:integrity-smoke": "node dist/testing/integrity-smoke.js",
+    "test:idempotency-smoke": "node dist/testing/idempotency-smoke.js"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "evaluation",
+    "fault-injection",
+    "reliability",
+    "agent",
+    "testing"
+  ],
+  "author": "Gigih Susetyo",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gigihsusetyo/mcp-faultline.git"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.1",
+    "commander": "^14.0.3",
+    "yaml": "^2.9.1",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.2",
+    "typescript": "^7.0.2"
+  }
+}

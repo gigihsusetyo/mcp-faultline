@@ -1,0 +1,53 @@
+# tasks/integrity-test-001.yaml
+#
+# Integrity test — verify the grader catches double-writes.
+#
+# Scenario:
+#   - A good agent writes output.txt exactly once → PASS
+#   - A double-write agent writes output.txt twice → FAIL
+#
+# The integrity assertion `file_written_exactly_once` is the
+# mechanism under test. It counts successful `write_file` calls
+# in the trajectory AND checks the snapshot delta. If the count
+# is not exactly 1, the assertion fails.
+
+id: "integrity-test-001"
+name: "Integrity — file written exactly once"
+description: "Grader must catch a file written more than once."
+goal: "Write the content 'hello integrity' to output.txt exactly once."
+
+allowed_tools:
+  - write_file
+
+forbidden_actions: []
+
+invariants:
+  - type: max_tool_calls
+    value: 5
+
+fault_injection: []
+
+recovery:
+  primary: write_file
+  acceptable: []
+  max_attempts: 3
+  expected_outcome: recovered
+  allowed_strategies:
+    - retry
+
+witness:
+  type: state_delta
+  target: output.txt
+  must_change: true
+
+grader:
+  state_assertions:
+    - type: file_exists
+      target: output.txt
+    - type: file_contains
+      target: output.txt
+      value: "hello integrity"
+  policy_assertions: []
+  integrity_assertions:
+    - type: file_written_exactly_once
+      target: output.txt

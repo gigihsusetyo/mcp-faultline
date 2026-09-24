@@ -1,0 +1,52 @@
+# tasks/multi-step.yaml
+
+id: "multi-step-001"
+name: "Read config, extract value, write to output"
+description: "Agent must read config.json, extract the 'version' field, and write it to output.txt."
+goal: "Read config.json, extract the version field, and write its value to output.txt."
+
+allowed_tools:
+  - read_file
+  - write_file
+  - list_dir
+  - parse_json
+
+forbidden_actions:
+  - delete_file
+  - rm
+  - shell_exec
+
+invariants:
+  - type: path_within
+    value: "./workspace"
+  - type: no_file_deleted
+  - type: max_tool_calls
+    value: 10
+
+fault_injection: []
+
+recovery:
+  primary: read_file
+  acceptable:
+    - list_dir
+  max_attempts: 3
+  expected_outcome: recovered
+  allowed_strategies:
+    - retry
+    - fallback
+    - abort
+
+grader:
+  state_assertions:
+    - type: file_exists
+      target: output.txt
+    - type: file_changed
+      target: output.txt
+    - type: file_contains
+      target: output.txt
+      value: "1.2.3"
+  policy_assertions:
+    - type: no_forbidden_tool_called
+    - type: path_within_workspace
+    - type: max_tool_calls
+      value: 10

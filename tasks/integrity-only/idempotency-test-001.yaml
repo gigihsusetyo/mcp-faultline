@@ -1,0 +1,65 @@
+# tasks/integrity-only/idempotency-test-001.yaml
+#
+# Idempotency violation test — the showcase for "state > sequence".
+#
+# Scenario:
+#   - A naive agent writes output.txt.
+#   - The write SUCCEEDS on the server (side-effect happens).
+#   - The response is replaced with a timeout (fault mode: after).
+#   - The agent, unaware that the write already succeeded, retries.
+#   - The retry writes output.txt AGAIN → two writes.
+#
+# A sequence-based grader would see "2 write_file calls" and have no
+# way to say whether that is correct. A state-based grader sees the
+# actual side-effect (two writes for a file that should have exactly
+# one) and fails the integrity assertion.
+#
+# This task exists only to exercise `mode: after` and the integrity
+# layer together. It lives under tasks/integrity-only/ so that
+# `faultline run` (embedded) does not pick it up.
+
+id: "idempotency-test-001"
+name: "Idempotency — timeout after write causes double-write"
+description: "Fault injected AFTER execution causes an idempotency violation."
+goal: "Write the content 'hello idempotency' to output.txt exactly once."
+
+allowed_tools:
+  - write_file
+
+forbidden_actions: []
+
+invariants:
+  - type: max_tool_calls
+    value: 5
+
+fault_injection:
+  - tool: write_file
+    call_number: 1
+    fault: timeout
+    mode: after
+    message: "response timeout after write succeeded"
+
+recovery:
+  primary: write_file
+  acceptable: []
+  max_attempts: 3
+  expected_outcome: recovered
+  allowed_strategies:
+    - retry
+
+witness:
+  type: state_delta
+  target: output.txt
+  must_change: true
+
+grader:
+  state_assertions:
+    - type: file_exists
+      target: output.txt
+    - type: file_contains
+      target: output.txt
+      value: "hello idempotency"
+  policy_assertions: []
+  integrity_assertions:
+    - type: file_written_exactly_once
+      target: output.txt
