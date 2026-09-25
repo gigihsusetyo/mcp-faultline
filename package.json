@@ -1,7 +1,7 @@
 {
   "name": "mcp-faultline",
   "version": "0.1.0",
-  "description": "Failure-mode evaluation for MCP agents — inject faults, observe trajectory, grade resilience.",
+  "description": "Failure-mode evaluation for MCP agents. Inject faults, observe trajectory, grade resilience.",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -12,12 +12,12 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "start": "node dist/index.js",
-    "test": "node --test dist-test/tests/",
-    "test:build": "tsc -p tsconfig.test.json",
     "clean": "rm -rf dist dist-test",
+    "test": "npm run test:proxy-smoke && npm run test:integrity-smoke && npm run test:idempotency-smoke",
     "test:proxy-smoke": "node dist/testing/proxy-smoke.js",
     "test:integrity-smoke": "node dist/testing/integrity-smoke.js",
-    "test:idempotency-smoke": "node dist/testing/idempotency-smoke.js"
+    "test:idempotency-smoke": "node dist/testing/idempotency-smoke.js",
+    "test:all": "npm run build && node dist/cli.js run && node dist/cli.js negative-controls && node dist/cli.js replay reports/report.json"
   },
   "keywords": [
     "mcp",
@@ -25,8 +25,10 @@
     "evaluation",
     "fault-injection",
     "reliability",
+    "resilience",
     "agent",
-    "testing"
+    "testing",
+    "mcp-proxy"
   ],
   "author": "Gigih Susetyo",
   "license": "MIT",
