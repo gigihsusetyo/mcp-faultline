@@ -1,0 +1,188 @@
+# Fault Injection Template
+#
+# Copy the entries you need into the `fault_injection` array of your task YAML.
+# Delete the rest.
+#
+# Full reference: references/fault-taxonomy.md
+
+# ============================================================================
+# TRANSPORT FAULTS
+# ============================================================================
+
+# Timeout: the call hangs and eventually times out.
+- tool: read_file
+  call_number: 1
+  fault: timeout
+  mode: instead
+  message: "Simulated timeout on first read"
+
+# Latency: the call succeeds, but with a delay.
+- tool: read_file
+  call_number: 1
+  fault: latency
+  mode: instead
+  duration_ms: 2000
+  message: "Simulated latency spike"
+
+# Disconnect: the connection drops mid-call.
+- tool: read_file
+  call_number: 1
+  fault: disconnect
+  mode: instead
+
+# Rate limit: the server rejects the call.
+- tool: read_file
+  call_number: 1
+  fault: rate_limit
+  mode: instead
+
+# ============================================================================
+# PROTOCOL FAULTS
+# ============================================================================
+
+# Malformed response: the response cannot be parsed.
+- tool: read_file
+  call_number: 1
+  fault: malformed_response
+  mode: instead
+
+# Invalid schema: the response parses, but violates the schema.
+- tool: read_file
+  call_number: 1
+  fault: invalid_schema
+  mode: instead
+
+# Missing field: the response is valid JSON, but a required field is absent.
+- tool: read_file
+  call_number: 1
+  fault: missing_field
+  mode: instead
+
+# ============================================================================
+# DATA FAULTS (the most interesting category)
+# ============================================================================
+
+# Empty: success status, but an empty payload.
+- tool: read_file
+  call_number: 1
+  fault: empty
+  mode: instead
+
+# Partial result: success status, but incomplete.
+- tool: read_file
+  call_number: 1
+  fault: partial_result
+  mode: instead
+
+# Stale: success status, but the data is outdated.
+- tool: read_file
+  call_number: 1
+  fault: stale
+  mode: instead
+
+# Contradictory: success status, but contradicts a prior result.
+- tool: read_file
+  call_number: 1
+  fault: contradictory
+  mode: instead
+
+# Wrong value: success status, but a specific field has an incorrect value.
+- tool: read_file
+  call_number: 1
+  fault: wrong_value
+  mode: instead
+
+# ============================================================================
+# AUTHORIZATION FAULTS
+# ============================================================================
+
+# Auth expired: the auth token has expired.
+- tool: read_file
+  call_number: 1
+  fault: auth_expired
+  mode: instead
+
+# Forbidden: the caller lacks permission.
+- tool: read_file
+  call_number: 1
+  fault: forbidden
+  mode: instead
+
+# ============================================================================
+# TEMPORAL FAULTS
+# ============================================================================
+
+# Delayed: the response arrives after a long delay, but is still valid.
+- tool: read_file
+  call_number: 1
+  fault: delayed
+  mode: instead
+  duration_ms: 5000
+
+# Out of order: the response corresponds to a different request.
+- tool: read_file
+  call_number: 1
+  fault: out_of_order
+  mode: instead
+
+# Replayed: the response is a replay of a previous response.
+- tool: read_file
+  call_number: 1
+  fault: replayed
+  mode: instead
+
+# ============================================================================
+# SYSTEMIC FAULTS
+# ============================================================================
+
+# Burst failure: many calls fail in a short window.
+- tool: read_file
+  call_number: 1
+  fault: burst_failure
+  mode: instead
+
+# Server outage: the target server is unreachable.
+- tool: read_file
+  call_number: 1
+  fault: server_outage
+  mode: instead
+
+# Cascading failure: one failure triggers dependent failures.
+- tool: read_file
+  call_number: 1
+  fault: cascading_failure
+  mode: instead
+
+# ============================================================================
+# IDEMPOTENCY VIOLATION (mode: after)
+# ============================================================================
+#
+# This is the pattern that Faultline was built for.
+#
+# The tool runs first. The side effect happens. Then the response is
+# replaced with a synthetic error. The agent believes the call failed,
+# retries, and the side effect happens again.
+#
+# Use this together with an integrity assertion:
+#   integrity_assertions:
+#     - type: file_written_exactly_once
+#       target: output.txt
+#
+- tool: write_file
+  call_number: 1
+  fault: timeout
+  mode: after
+  message: "Response timeout after write succeeded"
+
+# ============================================================================
+# NOTES
+# ============================================================================
+
+# - `tool` must match a tool name the MCP server exposes.
+# - `call_number` is 1-based, per tool. Call 1 of write_file is separate
+#   from call 1 of read_file.
+# - `mode: instead` replaces the call. The tool does not run.
+# - `mode: after` runs the tool first, then replaces the response.
+# - `message` overrides the default fault message.
+# - `duration_ms` is used only by latency-type faults.
+# - Faults fire at most once per matching entry.

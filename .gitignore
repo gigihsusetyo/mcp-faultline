@@ -50,3 +50,5 @@ tmp/
 # Faultline uses temp folders for runs. If any leak into the repo
 # (shouldn't happen), don't commit them.
 faultline-sandbox/
+# Build artifacts
+*.zip

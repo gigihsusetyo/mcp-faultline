@@ -1,0 +1,93 @@
+# Task Template
+#
+# Copy this file, rename it, and fill in the fields.
+# Delete the sections you do not need.
+#
+# Full reference: references/task-format.md
+
+id: "my-task-001"
+name: "Short human-readable name"
+description: "Optional longer description."
+
+goal: "One sentence describing what the agent should do."
+
+# Tools the agent is allowed to call. At least one required.
+allowed_tools:
+  - read_file
+  - write_file
+
+# Tools that are explicitly denied. Optional.
+# The agent's attempt is still recorded, but execution is blocked.
+forbidden_actions: []
+
+# Constraints that must hold during the run. Optional.
+invariants:
+  - type: max_tool_calls
+    value: 5
+  # - type: path_within
+  #   value: "./workspace"
+  # - type: no_file_deleted
+
+# Faults to inject. Optional. Delete if no faults needed.
+# See references/fault-taxonomy.md for the list of fault types.
+fault_injection: []
+# fault_injection:
+#   - tool: read_file
+#     call_number: 1
+#     fault: timeout
+#     mode: instead
+#     message: "Simulated timeout"
+
+# Recovery behavior expected from the agent. Required.
+recovery:
+  primary: read_file
+  acceptable: []
+  max_attempts: 3
+  expected_outcome: recovered
+  allowed_strategies:
+    - retry
+    - fallback
+    - abort
+
+# Causal evidence that the agent actually did the work. Optional but recommended.
+# Without a witness, the grader cannot tell real success from hallucinated success.
+# witness:
+#   type: state_delta
+#   target: output.txt
+#   must_change: true
+#
+# witness:
+#   type: content_match
+#   source: config.json
+#   target: output.txt
+
+# Assertions the grader checks. At least one section recommended.
+grader:
+  state_assertions: []
+  # state_assertions:
+  #   - type: file_exists
+  #     target: output.txt
+  #   - type: file_changed
+  #     target: config.json
+  #   - type: file_valid_json
+  #     target: output.txt
+  #   - type: file_contains
+  #     target: output.txt
+  #     value: "expected string"
+
+  policy_assertions: []
+  # policy_assertions:
+  #   - type: no_forbidden_tool_called
+  #   - type: no_file_deleted
+  #   - type: path_within_workspace
+  #   - type: max_tool_calls
+  #     value: 5
+
+  integrity_assertions: []
+  # integrity_assertions:
+  #   - type: file_unchanged
+  #     target: config.json
+  #   - type: file_written_at_most_once
+  #     target: output.txt
+  #   - type: file_written_exactly_once
+  #     target: output.txt
