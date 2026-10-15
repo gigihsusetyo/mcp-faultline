@@ -1,9 +1,18 @@
-# MCP-Faultline
+<p align="center">
+  <img src="./docs/logo.png" alt="MCP-Faultline" width="140" />
+</p>
 
-> **Break your MCP agent. Then prove it recovered.**
+<h1 align="center">MCP-Faultline</h1>
 
-[![CI](https://github.com/gigihsusetyo/mcp-faultline/actions/workflows/ci.yml/badge.svg)](https://github.com/gigihsusetyo/mcp-faultline/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+<p align="center"><em>Break your MCP agent. Then prove it recovered.</em></p>
+
+<p align="center">
+  <a href="https://github.com/gigihsusetyo/mcp-faultline/actions/workflows/ci.yml"><img src="https://github.com/gigihsusetyo/mcp-faultline/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
+  <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" /></a>
+  <a href="https://www.agensi.io/skills/mcp-faultline"><img src="https://img.shields.io/badge/Agensi.io-available-blue" alt="Agensi.io" /></a>
+</p>
+
+---
 
 Faultline injects controlled failures into an MCP agent's tool calls, records the trajectory, and grades whether the agent recovered. With evidence, not just pass/fail.
 
@@ -169,7 +178,7 @@ The bench measures whether the agent can solve the task. The chaos tool injects 
 
 Honest list. These are the things that are not done yet.
 
-- **Mode A only.** We grade what the agent attempted, not what it consequences were. Mode B is future work.
+- **Mode A only.** We grade what the agent attempted, not what the consequences were. Mode B is future work.
 - **File-based side effects only.** Network calls, emails, git commits are not tracked.
 - **One external agent tested.** Cline. Claude Code, Cursor, etc. are untested.
 - **No LLM judge.** Everything is deterministic. No model in the grading loop.
@@ -227,6 +236,6 @@ MIT. See [LICENSE](./LICENSE).
 
 ## Author
 
-**Gigih Susetyo**. Technical Project Lead, AI Orchestrator.
+**Gigih Susetyo**
 
-> *"AI generates. I orchestrate."*
+Available as an agent skill on [Agensi.io](https://www.agensi.io/skills/mcp-faultline).
