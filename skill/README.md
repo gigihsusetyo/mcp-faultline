@@ -115,5 +115,5 @@ Additional limitations specific to the skill:
 ## Links
 
 - MCP-Faultline repo: https://github.com/gigihsusetyo/mcp-faultline
-- Agensi.io: https://www.agensi.io/
+- Agensi.io listing: https://www.agensi.io/skills/mcp-faultline
 - License: MIT
