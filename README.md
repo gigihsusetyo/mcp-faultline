@@ -226,6 +226,8 @@ A few decisions worth explaining.
 - Node.js >= 20
 - No Docker. No external services. No API keys for the embedded suite.
 
+Tested on macOS, Linux, and Windows 10.
+
 ---
 
 ## License
