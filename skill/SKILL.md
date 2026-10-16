@@ -30,6 +30,8 @@ If the user asks for a mix of testing and fixing, run the evaluation, report the
 - Git and npm available on the system.
 - A terminal the agent can run commands in.
 
+Tested on macOS, Linux, and Windows 10. The embedded task suite and the stdio proxy have been verified on all three.
+
 Verify Node.js:
 
     node --version
