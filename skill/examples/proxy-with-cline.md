@@ -24,8 +24,13 @@ The mock server has one tool: `echo`.
 
 Before configuring Cline, run the proxy manually to confirm it spawns the mock server correctly.
 
-    node dist/cli.js proxy \
-      --server "node tests/fixtures/mock-mcp-server.mjs"
+macOS / Linux:
+
+    node dist/cli.js proxy --server "node tests/fixtures/mock-mcp-server.mjs"
+
+Windows (PowerShell):
+
+    node dist/cli.js proxy --server "node tests\fixtures\mock-mcp-server.mjs"
 
 You should see log lines starting with `[proxy]`:
 
@@ -43,11 +48,19 @@ On macOS:
 
     ~/Library/Application Support/Code/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json
 
+On Windows:
+
+    %APPDATA%\Code\User\globalStorage\saoudrizwan.claude-dev\settings\cline_mcp_settings.json
+
+On Linux:
+
+    ~/.config/Code/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json
+
 The easiest way to open it: in VS Code, open the Cline panel, go to MCP Servers, click the gear icon, and choose Configure MCP Servers.
 
 ## Step 3: Add the proxy to the config
 
-Paste this into the JSON file. Replace `/absolute/path/to/mcp-faultline` with the actual path on your machine. Use `pwd` in the repo folder to get it.
+macOS / Linux:
 
     {
       "mcpServers": {
@@ -65,11 +78,31 @@ Paste this into the JSON file. Replace `/absolute/path/to/mcp-faultline` with th
       }
     }
 
+Windows:
+
+    {
+      "mcpServers": {
+        "faultline-proxy": {
+          "command": "node",
+          "args": [
+            "C:\\path\\to\\mcp-faultline\\dist\\cli.js",
+            "proxy",
+            "--server",
+            "node C:\\path\\to\\mcp-faultline\\tests\\fixtures\\mock-mcp-server.mjs"
+          ],
+          "disabled": false,
+          "autoApprove": []
+        }
+      }
+    }
+
+Replace `/absolute/path/to/mcp-faultline` with the actual path on your machine. Use `pwd` in the repo folder to get it (macOS/Linux) or `cd` (Windows).
+
 There is no `--task` flag yet. This means the proxy forwards everything without injecting faults. This is the safe first step: verify the connection works before adding faults.
 
 ## Step 4: Reload VS Code
 
-Open the command palette (`Cmd+Shift+P` on macOS) and run:
+Open the command palette (`Cmd+Shift+P` on macOS, `Ctrl+Shift+P` on Windows) and run:
 
     Developer: Reload Window
 
@@ -101,6 +134,8 @@ The task completes. No faults were injected.
 
 Now edit the Cline config again. Add the `--task` flag:
 
+macOS / Linux:
+
       "args": [
         "/absolute/path/to/mcp-faultline/dist/cli.js",
         "proxy",
@@ -108,6 +143,17 @@ Now edit the Cline config again. Add the `--task` flag:
         "node /absolute/path/to/mcp-faultline/tests/fixtures/mock-mcp-server.mjs",
         "--task",
         "/absolute/path/to/mcp-faultline/tasks/proxy-only/echo-fault-smoke.yaml"
+      ],
+
+Windows:
+
+      "args": [
+        "C:\\path\\to\\mcp-faultline\\dist\\cli.js",
+        "proxy",
+        "--server",
+        "node C:\\path\\to\\mcp-faultline\\tests\\fixtures\\mock-mcp-server.mjs",
+        "--task",
+        "C:\\path\\to\\mcp-faultline\\tasks\\proxy-only\\echo-fault-smoke.yaml"
       ],
 
 Reload VS Code. Verify the connection again.

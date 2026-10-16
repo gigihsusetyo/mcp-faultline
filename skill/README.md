@@ -24,6 +24,7 @@ The skill does not contain the engine. The engine lives in the GitHub repo. This
     |   |-- fault-taxonomy.md             18 fault types across 6 categories
     |   |-- proxy-setup.md                How to configure the stdio proxy
     |   |-- report-reading.md             How to read the JSON and Markdown reports
+    |   |-- adversarial-scenarios.md      Edge cases to test before publishing
     |-- examples/
     |   |-- basic-run.md                  Simplest walkthrough
     |   |-- custom-task.md                Write your own task
@@ -34,7 +35,7 @@ The skill does not contain the engine. The engine lives in the GitHub repo. This
 
 ## How the skill works
 
-1. User installs the skill through their agent (Claude Code, Cursor, etc.).
+1. User installs the skill through their agent.
 2. Agent reads SKILL.md.
 3. Skill's frontmatter tells the agent when to trigger: when the user wants to test agent resilience under fault.
 4. Agent follows the instructions: verify MCP-Faultline is installed, run it, read the report, explain the results.

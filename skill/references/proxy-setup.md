@@ -1,14 +1,16 @@
 # Proxy Setup
 
-The stdio proxy lets Faultline sit between a real external agent (Cline, Claude Code, Cursor) and a real MCP server. The proxy injects faults into the traffic without the agent knowing.
+The stdio proxy lets Faultline sit between a real external agent and a real MCP server. The proxy injects faults into the traffic without the agent knowing.
 
 This is what makes Faultline agent-agnostic. The agent runs normally. Faultline does not run the agent's loop.
+
+Tested with Cline in VS Code. Other SKILL.md-compatible agents (Claude Code, Cursor) should work with the same configuration pattern, but are untested.
 
 ## When to use the proxy
 
 Use the proxy when:
 
-- The user wants to test an agent they already use (Cline, Claude Code, etc.).
+- The user wants to test an agent they already use.
 - The user wants to test a real MCP server, not the mock server Faultline ships.
 - The user wants to observe fault handling without modifying the agent.
 
@@ -30,9 +32,9 @@ Every `tools/call` from the agent is intercepted. The fault runtime decides whet
 
 ## Basic command
 
-    node dist/cli.js proxy \
-      --server "node /path/to/your-mcp-server.js" \
-      --task tasks/proxy-only/echo-fault-smoke.yaml
+Single-line command works the same on macOS, Linux, and Windows:
+
+    node dist/cli.js proxy --server "node /path/to/your-mcp-server.js" --task tasks/proxy-only/echo-fault-smoke.yaml
 
 Flags:
 
@@ -41,6 +43,10 @@ Flags:
 - `--cwd` (optional) - working directory for the spawned server.
 
 If `--task` is omitted, the proxy forwards all traffic without injecting faults. This is useful for verifying that the proxy works before adding faults.
+
+On Windows, replace the paths with Windows-style paths:
+
+    node dist/cli.js proxy --server "node C:\path\to\your-mcp-server.js" --task tasks\proxy-only\echo-fault-smoke.yaml
 
 ## Security posture
 
@@ -62,9 +68,19 @@ On macOS:
 
     ~/Library/Application Support/Code/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json
 
+On Windows:
+
+    %APPDATA%\Code\User\globalStorage\saoudrizwan.claude-dev\settings\cline_mcp_settings.json
+
+On Linux:
+
+    ~/.config/Code/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json
+
 In VS Code, open Cline, go to MCP Servers, and click Configure MCP Servers. VS Code opens the file.
 
 ### Step 2: Add the proxy entry
+
+macOS and Linux:
 
     {
       "mcpServers": {
@@ -84,7 +100,27 @@ In VS Code, open Cline, go to MCP Servers, and click Configure MCP Servers. VS C
       }
     }
 
-Use absolute paths. The config does not resolve relative paths from the workspace.
+Windows:
+
+    {
+      "mcpServers": {
+        "faultline-proxy": {
+          "command": "node",
+          "args": [
+            "C:\\path\\to\\mcp-faultline\\dist\\cli.js",
+            "proxy",
+            "--server",
+            "node C:\\path\\to\\your-mcp-server.js",
+            "--task",
+            "C:\\path\\to\\mcp-faultline\\tasks\\proxy-only\\echo-fault-smoke.yaml"
+          ],
+          "disabled": false,
+          "autoApprove": []
+        }
+      }
+    }
+
+Use absolute paths. The config does not resolve relative paths from the workspace. On Windows, backslashes in JSON strings must be escaped (`\\`).
 
 If you do not want to inject faults yet, remove the `--task` flag and its value.
 
@@ -108,7 +144,7 @@ The first call should return a synthetic fault. If the agent retries, the second
 
 ### Cannot find module '/Users/.../dist/cli.js'
 
-The path in the config is wrong. Use `pwd` in the terminal to get the absolute path of the repo, then update the config.
+The path in the config is wrong. Use `pwd` (macOS/Linux) or `cd` (Windows) in the terminal to get the absolute path of the repo, then update the config.
 
 ### Connection closed immediately
 

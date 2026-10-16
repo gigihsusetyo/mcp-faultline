@@ -46,7 +46,11 @@ If the CLI is on the PATH (for example, installed globally or linked):
 
     mcp-faultline --version
 
-If it prints a version, skip to Usage.
+If it prints a version number (for example, `0.2.0`), check whether it is the expected version.
+
+- If the version is `0.2.0` or newer, skip to Usage.
+- If the version is older than `0.2.0`, the CLI is outdated. Tell the user, and either upgrade it or install a fresh copy from the public repo (see the install step below).
+- If the output does not look like a version number, report what you saw and ask the user.
 
 If the command fails, inspect the error before assuming the CLI is not installed.
 
@@ -60,7 +64,7 @@ Note: `npx mcp-faultline --version` may download the package if it is not instal
 
 If it is not installed, clone and build it. Pick a destination folder that does not already exist. Do not overwrite an existing folder without asking the user first.
 
-For example, clone into the home directory:
+Pick a destination folder, for example the user's home directory:
 
     cd ~
     git clone https://github.com/gigihsusetyo/mcp-faultline.git
@@ -69,6 +73,14 @@ For example, clone into the home directory:
     npm run build
 
 `npm ci` uses the checked-in `package-lock.json` to install exact versions. Do not use `npm install` here.
+
+The `~` shortcut works in Unix shells (macOS, Linux) and in PowerShell 7+. On older Windows shells, use the full path to the user's home folder instead (for example, `cd C:\Users\<name>`).
+
+After a successful build, verify it with:
+
+    node dist/cli.js --version
+
+This should print `0.2.0` or newer.
 
 If `git clone` fails because the folder already exists, ask the user what to do. Options:
 
@@ -138,11 +150,17 @@ If the replay does not match, it usually means the agent behaved differently tha
 
 ### Use the stdio proxy
 
-The proxy sits between a real external agent (Cline, Claude Code, etc.) and a real MCP server. The proxy injects faults into the traffic.
+The proxy sits between a real external agent and a real MCP server. The proxy injects faults into the traffic.
 
-    node dist/cli.js proxy \
-      --server "node /path/to/mcp-server.js" \
-      --task tasks/proxy-only/echo-fault-smoke.yaml
+Tested with Cline in VS Code. Claude Code and Cursor should work with the same configuration pattern, but are untested.
+
+Run the proxy with a single-line command so it works the same on macOS, Linux, and Windows:
+
+    node dist/cli.js proxy --server "node /path/to/mcp-server.js" --task tasks/proxy-only/echo-fault-smoke.yaml
+
+On Windows, replace the paths with Windows-style paths, and use the corresponding separator:
+
+    node dist/cli.js proxy --server "node C:\path\to\mcp-server.js" --task tasks\proxy-only\echo-fault-smoke.yaml
 
 For setup with Cline specifically, see `references/proxy-setup.md`. The reference covers where to find the config file, how to add the proxy entry, and how to verify the connection.
 
