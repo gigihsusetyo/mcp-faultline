@@ -1,0 +1,31 @@
+# Cross-platform line endings
+# Force LF for all text files, regardless of OS.
+# Without this, git on Windows checks out text files with CRLF,
+# which can break shell scripts and some Node.js parsers.
+
+* text=auto eol=lf
+
+# Explicit for languages and config
+*.ts    text eol=lf
+*.js    text eol=lf
+*.mjs   text eol=lf
+*.json  text eol=lf
+*.yaml  text eol=lf
+*.yml   text eol=lf
+*.md    text eol=lf
+*.txt   text eol=lf
+
+# Shell scripts must use LF
+*.sh    text eol=lf
+
+# Binary files - never convert
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.ico   binary
+*.zip   binary
+
+# Windows-specific (if added later)
+*.bat   text eol=crlf
+*.cmd   text eol=crlf
