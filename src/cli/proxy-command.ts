@@ -44,6 +44,12 @@ export interface ProxyCommandArgs {
  * Handles single quotes, double quotes, and backslash escapes at a
  * level sufficient for typical MCP server invocations. Not a full
  * shell parser — no variable expansion, no pipes, no redirection.
+ *
+ * Backslash behavior:
+ *   - Outside quotes: treated as a literal character. This matters on
+ *     Windows, where `tests\fixtures\server.js` must be preserved as-is.
+ *   - Inside quotes: treated as an escape character. This is needed to
+ *     handle `\"` (escaped quote) inside a quoted argument.
  */
 function splitCommandLine(input: string): { command: string; args: string[] } {
   const tokens: string[] = [];
@@ -60,7 +66,9 @@ function splitCommandLine(input: string): { command: string; args: string[] } {
       continue;
     }
 
-    if (ch === '\\' && quote !== "'") {
+    // Backslash is only an escape character inside a quote.
+    // Outside quotes, it is a literal character (Windows path).
+    if (ch === '\\' && (quote === '"' || quote === "'")) {
       escaped = true;
       continue;
     }
